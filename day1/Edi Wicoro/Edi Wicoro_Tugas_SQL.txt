@@ -1,0 +1,119 @@
+-- EDI WICORO --
+
+CREATE TABLE pembeli (
+    kode_pembeli VARCHAR(10) PRIMARY KEY,
+    nama_pembeli VARCHAR(100)
+);
+
+INSERT INTO pembeli (kode_pembeli, nama_pembeli) VALUES 
+('JM', 'Joko Morro'),
+('EK', 'Eko Kurniawan');
+
+CREATE TABLE penjual (
+    kode_penjual VARCHAR(10) PRIMARY KEY,
+    nama_penjual VARCHAR(100)
+);
+
+INSERT INTO penjual (kode_penjual, nama_penjual) VALUES 
+('GO', 'Galeri Olahraga'),
+('HS', 'Hello Store');
+
+CREATE TABLE alamat (
+    kode_alamat VARCHAR(10) PRIMARY KEY,
+    kode_pembeli VARCHAR(10),
+    alamat_nama VARCHAR(100),
+    alamat_jalan VARCHAR(255),
+    alamat_provinsi VARCHAR(100),
+    alamat_kota VARCHAR(100),
+    alamat_negara VARCHAR(100),
+    alamat_kodepos INT
+);
+
+INSERT INTO alamat (kode_alamat, kode_pembeli, alamat_nama, alamat_jalan, alamat_provinsi, alamat_kota, alamat_negara, alamat_kodepos) VALUES 
+('BN', 'JM', 'Budi Nugraha', 'Jalan raya xxx', 'DKI Jakarta', 'Jakarta', 'Indonesia', 433333),
+('RL', 'EK', 'Rully', 'Jalan raya baru', 'Jawa Barat', 'Bandung', 'Indonesia', 432434);
+
+
+CREATE TABLE kurir (
+    kode_kurir VARCHAR(10) PRIMARY KEY,
+    nama_kurir VARCHAR(100)
+);
+
+INSERT INTO kurir (kode_kurir, nama_kurir) VALUES 
+('SG', 'Sicepat - Gokil'),
+('JN', 'JNE');
+
+
+CREATE TABLE metode_pembayaran (
+    kode_pembayaran VARCHAR(10) PRIMARY KEY,
+    nama_metode VARCHAR(100)
+);
+
+INSERT INTO metode_pembayaran (kode_pembayaran, nama_metode) VALUES 
+('DO', 'Debit Online'),
+('CC', 'Credit Card');
+
+CREATE TABLE produk (
+    kode_produk VARCHAR(10) PRIMARY KEY,
+    produk_nama VARCHAR(255),
+    produk_berat INT,
+    produk_harga INT,
+    kode_penjual VARCHAR(10)
+);
+
+INSERT INTO produk (kode_produk, produk_nama, produk_berat, produk_harga, kode_penjual) VALUES 
+('P0001', 'Bola Basket Size 7', 2300, 177900, 'GO'),
+('P0002', 'Bola Basket Size 5', 500, 98900, 'GO'),
+('P0003', 'Pentil Pompa Bola', 54, 9900, 'GO'),
+('P0004', 'Pompa Bola', 198, 43900, 'GO'),
+('P0005', 'Apple iPhone Pro Max', 1000, 25000000, 'HS'),
+('P0006', 'Apple Watch 8', 2000, 8000000, 'HS');
+
+CREATE TABLE data_order (
+    no_order INT PRIMARY KEY,
+    tanggal DATE,
+    kode_alamat VARCHAR(10),
+    total_ongkos INT,
+    biaya_jasa INT,
+    metode_pembayaran VARCHAR(10),
+    kurir VARCHAR(10)
+);
+
+INSERT INTO data_order (no_order, tanggal, kode_alamat, total_ongkos, biaya_jasa, metode_pembayaran, kurir) VALUES 
+(12345, '2023-04-11', 'BN', 60000, 1000, 'DO', 'SG'),
+(11111, '2023-04-12', 'RL', 100000, 1000, 'CC', 'JN'),
+(22222, '2023-04-13', 'BN', 60000, 1000, 'DO', 'SG');
+
+CREATE TABLE detail_order (
+    kode_produk VARCHAR(10),
+    no_order INT,
+    produk_jumlah INT,
+    PRIMARY KEY (kode_produk, no_order)
+);
+
+INSERT INTO detail_order (kode_produk, no_order, produk_jumlah) VALUES 
+('P0001', 12345, 2),
+('P0002', 12345, 1),
+('P0003', 12345, 1),
+('P0004', 12345, 1),
+('P0005', 11111, 1),
+('P0006', 11111, 1),
+('P0001', 22222, 2);
+
+
+ALTER TABLE alamat
+ADD CONSTRAINT fk_alamat_pembeli 
+FOREIGN KEY (kode_pembeli) REFERENCES pembeli(kode_pembeli);
+
+ALTER TABLE produk
+ADD CONSTRAINT fk_produk_penjual 
+FOREIGN KEY (kode_penjual) REFERENCES penjual(kode_penjual);
+
+ALTER TABLE data_order
+ADD CONSTRAINT fk_order_alamat FOREIGN KEY (kode_alamat) REFERENCES alamat(kode_alamat),
+ADD CONSTRAINT fk_order_kurir FOREIGN KEY (kurir) REFERENCES kurir(kode_kurir),
+ADD CONSTRAINT fk_order_pembayaran FOREIGN KEY (metode_pembayaran) REFERENCES metode_pembayaran(kode_pembayaran);
+
+ALTER TABLE detail_order
+ADD CONSTRAINT fk_detail_order FOREIGN KEY (no_order) REFERENCES data_order(no_order),
+ADD CONSTRAINT fk_detail_produk FOREIGN KEY (kode_produk) REFERENCES produk(kode_produk);
